@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Circuitos Eléctricos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .section h2 {
+            color: #444;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .circuit-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .circuit-btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: 2px solid #4CAF50;
+            background-color: white;
+            color: #4CAF50;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .circuit-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            text-align: center;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .voltage-input {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .voltage-input input {
+            width: 200px;
+            padding: 10px;
+            border: 2px solid #2196F3;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .calculate-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .calculate-button:hover {
+            background-color: #45a049;
+        }
+
+        .formulas {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .formula-item {
+            background-color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border-left: 4px solid #2196F3;
+            font-family: monospace;
+            font-size: 16px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .results-table th,
+        .results-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .results-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .main-results {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            border: 2px solid #4CAF50;
+        }
+
+        .result-box h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .circuit-info {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Circuitos Eléctricos</h1>
+        
+        <div class="section">
+            <h2>Tipo de Circuito</h2>
+            <div class="circuit-buttons">
+                <button class="circuit-btn active" onclick="selectCircuit('serie')">Serie</button>
+                <button class="circuit-btn" onclick="selectCircuit('paralelo')">Paralelo</button>
+            </div>
+            <div class="circuit-info" id="circuit-info">
+                <strong>Circuito en Serie:</strong><br>
+                - Las resistencias van una tras otra<br>
+                - La corriente es igual en todas las resistencias<br>
+                - El voltaje se reparte entre las resistencias
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Datos del Circuito</h2>
+            <div class="inputs-grid">
+                <div class="input-group">
+                    <label>R1 (Ω)</label>
+                    <input type="number" id="r1" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R2 (Ω)</label>
+                    <input type="number" id="r2" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R3 (Ω)</label>
+                    <input type="number" id="r3" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R4 (Ω)</label>
+                    <input type="number" id="r4" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R5 (Ω)</label>
+                    <input type="number" id="r5" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R6 (Ω)</label>
+                    <input type="number" id="r6" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R7 (Ω)</label>
+                    <input type="number" id="r7" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>R8 (Ω)</label>
+                    <input type="number" id="r8" placeholder="0">
+                </div>
+            </div>
+            
+            <div class="voltage-input">
+                <label>Voltaje de la fuente (V):</label><br>
+                <input type="number" id="voltage" placeholder="0">
+            </div>
+        </div>
+
+        <button class="calculate-button" onclick="calculateCircuit()">CALCULAR</button>
+
+        <div class="section hidden" id="results">
+            <h2>Fórmulas Utilizadas</h2>
+            <div class="formulas" id="formulas"></div>
+
+            <h2>Resultados Principales</h2>
+            <div class="main-results" id="main-results"></div>
+
+            <h2>Resultados por Resistencia</h2>
+            <table class="results-table" id="results-table">
+                <thead>
+                    <tr>
+                        <th>Resistencia</th>
+                        <th>Valor (Ω)</th>
+                        <th>Voltaje (V)</th>
+                        <th>Corriente (A)</th>
+                        <th>Potencia (W)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentCircuit = 'serie';
+
+        function selectCircuit(type) {
+            currentCircuit = type;
+            
+            // Cambiar botones
+            document.querySelectorAll('.circuit-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Cambiar información
+            const info = document.getElementById('circuit-info');
+            if (type === 'serie') {
+                info.innerHTML = `
+                    <strong>Circuito en Serie:</strong><br>
+                    - Las resistencias van una tras otra<br>
+                    - La corriente es igual en todas las resistencias<br>
+                    - El voltaje se reparte entre las resistencias
+                `;
+            } else {
+                info.innerHTML = `
+                    <strong>Circuito en Paralelo:</strong><br>
+                    - Las resistencias van en ramas separadas<br>
+                    - El voltaje es igual en todas las resistencias<br>
+                    - La corriente se reparte entre las resistencias
+                `;
+            }
+            
+            // Ocultar resultados
+            document.getElementById('results').classList.add('hidden');
+        }
+
+        function calculateCircuit() {
+            // Obtener valores de resistencias
+            const resistances = [];
+            for (let i = 1; i <= 8; i++) {
+                const value = parseFloat(document.getElementById('r' + i).value);
+                if (isNaN(value) || value <= 0) {
+                    alert('Por favor llena todas las resistencias con valores mayores a 0');
+                    return;
+                }
+                resistances.push(value);
+            }
+
+            // Obtener voltaje
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            if (isNaN(voltage) || voltage <= 0) {
+                alert('Por favor ingresa un voltaje válido');
+                return;
+            }
+
+            // Calcular según el tipo de circuito
+            let results;
+            if (currentCircuit === 'serie') {
+                results = calculateSeries(resistances, voltage);
+            } else {
+                results = calculateParallel(resistances, voltage);
+            }
+
+            // Mostrar resultados
+            showResults(results);
+        }
+
+        function calculateSeries(resistances, voltage) {
+            // Resistencia total: Rt = R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8
+            const totalResistance = resistances.reduce((sum, r) => sum + r, 0);
+            
+            // Corriente total: I = V / Rt
+            const totalCurrent = voltage / totalResistance;
+            
+            // Potencia total: P = V * I
+            const totalPower = voltage * totalCurrent;
+            
+            // Para cada resistencia
+            const individualVoltages = resistances.map(r => r * totalCurrent);
+            const individualCurrents = new Array(8).fill(totalCurrent);
+            const individualPowers = resistances.map(r => r * totalCurrent * totalCurrent);
+
+            return {
+                type: 'serie',
+                totalResistance: totalResistance,
+                totalCurrent: totalCurrent,
+                totalPower: totalPower,
+                voltage: voltage,
+                resistances: resistances,
+                individualVoltages: individualVoltages,
+                individualCurrents: individualCurrents,
+                individualPowers: individualPowers
+            };
+        }
+
+        function calculateParallel(resistances, voltage) {
+            // Resistencia total: 1/Rt = 1/R1 + 1/R2 + ... + 1/R8
+            const reciprocalSum = resistances.reduce((sum, r) => sum + (1/r), 0);
+            const totalResistance = 1 / reciprocalSum;
+            
+            // Corriente total: I = V / Rt
+            const totalCurrent = voltage / totalResistance;
+            
+            // Potencia total: P = V * I
+            const totalPower = voltage * totalCurrent;
+            
+            // Para cada resistencia
+            const individualVoltages = new Array(8).fill(voltage);
+            const individualCurrents = resistances.map(r => voltage / r);
+            const individualPowers = resistances.map(r => (voltage * voltage) / r);
+
+            return {
+                type: 'paralelo',
+                totalResistance: totalResistance,
+                totalCurrent: totalCurrent,
+                totalPower: totalPower,
+                voltage: voltage,
+                resistances: resistances,
+                individualVoltages: individualVoltages,
+                individualCurrents: individualCurrents,
+                individualPowers: individualPowers
+            };
+        }
+
+        function showResults(results) {
+            // Mostrar fórmulas
+            const formulasDiv = document.getElementById('formulas');
+            if (results.type === 'serie') {
+                formulasDiv.innerHTML = `
+                    <div class="formula-item">Rt = R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8</div>
+                    <div class="formula-item">I = V / Rt</div>
+                    <div class="formula-item">V(resistencia) = R × I</div>
+                    <div class="formula-item">P(resistencia) = R × I²</div>
+                `;
+            } else {
+                formulasDiv.innerHTML = `
+                    <div class="formula-item">1/Rt = 1/R1 + 1/R2 + 1/R3 + 1/R4 + 1/R5 + 1/R6 + 1/R7 + 1/R8</div>
+                    <div class="formula-item">I(total) = V / Rt</div>
+                    <div class="formula-item">I(resistencia) = V / R</div>
+                    <div class="formula-item">P(resistencia) = V² / R</div>
+                `;
+            }
+
+            // Mostrar resultados principales
+            const mainResultsDiv = document.getElementById('main-results');
+            mainResultsDiv.innerHTML = `
+                <div class="result-box">
+                    <h3>Resistencia Total</h3>
+                    <div class="result-value">${results.totalResistance.toFixed(2)} Ω</div>
+                </div>
+                <div class="result-box">
+                    <h3>Corriente Total</h3>
+                    <div class="result-value">${results.totalCurrent.toFixed(3)} A</div>
+                </div>
+                <div class="result-box">
+                    <h3>Potencia Total</h3>
+                    <div class="result-value">${results.totalPower.toFixed(2)} W</div>
+                </div>
+                <div class="result-box">
+                    <h3>Voltaje Fuente</h3>
+                    <div class="result-value">${results.voltage} V</div>
+                </div>
+            `;
+
+            // Llenar tabla
+            const tableBody = document.getElementById('table-body');
+            let tableHTML = '';
+            for (let i = 0; i < 8; i++) {
+                tableHTML += `
+                    <tr>
+                        <td>R${i+1}</td>
+                        <td>${results.resistances[i]} Ω</td>
+                        <td>${results.individualVoltages[i].toFixed(2)} V</td>
+                        <td>${results.individualCurrents[i].toFixed(3)} A</td>
+                        <td>${results.individualPowers[i].toFixed(2)} W</td>
+                    </tr>
+                `;
+            }
+            tableBody.innerHTML = tableHTML;
+
+            // Mostrar sección de resultados
+            document.getElementById('results').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
